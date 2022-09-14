@@ -18,4 +18,4 @@ export async function insertNewUser(newUser: TypeNewUser) {
     return prisma.user.create({
       data: newUser,
     });
-  }
+}

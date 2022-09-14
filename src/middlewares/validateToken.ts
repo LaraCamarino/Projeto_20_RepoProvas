@@ -18,17 +18,19 @@ export default async function validateToken(req: Request, res: Response, next: N
         };
     }
 
-    const { userId } = jwt.verify(token, process.env.JWT_SECRET_KEY) as IToken;
+    try {
+        const { userId } = jwt.verify(token, process.env.JWT_SECRET_KEY) as IToken;
 
-    const user = await authRepository.findUserById(userId);
-    if (!user) {
+        const user = await authRepository.findUserById(userId);
+        
+        res.locals.user = user;
+
+        next();
+    }
+    catch {
         throw {
             type: "unauthorized",
             message: "Invalid token."
         };
     }
-
-    res.locals.user = user;
-
-    next();
 }
