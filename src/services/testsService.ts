@@ -1,5 +1,5 @@
 import * as testsRepository from "../repositories/testsRepository.js";
-import { TypeNewTest, TypeTestNoID } from "../types/testsTypes.js";
+import { TypeNewTest } from "../types/testsTypes.js";
 
 export async function insertNewTest(newTest: TypeNewTest) {
     const { name, pdfUrl, categoryId, teacherId, disciplineId } = newTest;

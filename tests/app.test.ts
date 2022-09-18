@@ -5,8 +5,6 @@ import app from "../src/app";
 import prisma from "../src/dbStrategy/database";
 import * as userFactory from "./factories/userFactory";
 import * as testFactory from "./factories/testFactory";
-import exp from "constants";
-import { array } from "joi";
 
 dotenv.config();
 console.log("Database = " + process.env.DATABASE_URL);

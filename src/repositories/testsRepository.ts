@@ -1,5 +1,3 @@
-import { truncate } from "fs/promises";
-import { number } from "joi";
 import prisma from "../dbStrategy/database.js";
 
 import { TypeTestNoID } from "../types/testsTypes.js";
@@ -37,36 +35,21 @@ export async function insertNewTest(newTest: TypeTestNoID) {
 export async function getTestsGroupedByTerms() {
   return prisma.term.findMany({
     orderBy: { number: "asc" },
-    include: {
+    select: {
+      number: true,
       disciplines: {
+        distinct: ["name"],
         select: {
           name: true,
           teacherDisciplines: {
             select: {
               tests: {
-                distinct: ["categoryId"],
                 select: {
-                  category: {
-                    select: {
-                      name: true,
-                      tests: {
-                        select: {
-                          id: true,
-                          name: true,
-                          pdfUrl: true,
-                          teacherDiscipline: {
-                            select: {
-                              teacher: {
-                                select: {
-                                  name: true
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+                  id: true,
+                  name: true,
+                  pdfUrl: true,
+                  category: { select: { name: true } },
+                  teacherDiscipline: { select: { teacher: { select: { name: true } } } }
                 }
               }
             }
@@ -84,27 +67,14 @@ export async function getTestsGroupedByTeacher() {
       name: true,
       teacherDisciplines: {
         select: {
-          disciplineId: true,
-          discipline: {
-            select: {
-              name: true,
-              term: {
-                select: {
-                  number: true,
-                }
-              }
-            }
-          },
+          discipline: { select: { term: { select: { number: true } } } },
           tests: {
             select: {
+              category: { select: { name: true }, },
               id: true,
               name: true,
               pdfUrl: true,
-              category: {
-                select: {
-                  name: true
-                }
-              }
+              teacherDiscipline: { select: { discipline: { select: { name: true } } } }
             }
           }
         }
