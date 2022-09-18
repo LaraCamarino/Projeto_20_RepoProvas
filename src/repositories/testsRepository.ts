@@ -1,3 +1,4 @@
+import { truncate } from "fs/promises";
 import { number } from "joi";
 import prisma from "../dbStrategy/database.js";
 
@@ -35,6 +36,7 @@ export async function insertNewTest(newTest: TypeTestNoID) {
 
 export async function getTestsGroupedByTerms() {
   return prisma.term.findMany({
+    orderBy: { number: "asc" },
     include: {
       disciplines: {
         select: {
@@ -77,17 +79,32 @@ export async function getTestsGroupedByTerms() {
 
 export async function getTestsGroupedByTeacher() {
   return prisma.teacher.findMany({
+    orderBy: { name: "desc" },
     select: {
       name: true,
       teacherDisciplines: {
         select: {
-          tests: {
-            distinct: ["categoryId"],
+          disciplineId: true,
+          discipline: {
             select: {
-              id: true, 
-              name: true, 
-              pdfUrl: true, 
-              category: true,
+              name: true,
+              term: {
+                select: {
+                  number: true,
+                }
+              }
+            }
+          },
+          tests: {
+            select: {
+              id: true,
+              name: true,
+              pdfUrl: true,
+              category: {
+                select: {
+                  name: true
+                }
+              }
             }
           }
         }
