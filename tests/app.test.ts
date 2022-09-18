@@ -5,6 +5,8 @@ import app from "../src/app";
 import prisma from "../src/dbStrategy/database";
 import * as userFactory from "./factories/userFactory";
 import * as testFactory from "./factories/testFactory";
+import exp from "constants";
+import { array } from "joi";
 
 dotenv.config();
 console.log("Database = " + process.env.DATABASE_URL);
@@ -78,7 +80,7 @@ describe("Test POST /sign-in", () => {
 describe("Test POST /tests", () => {
     it("Should create a new test and return statusCode 201", async () => {
         const user = userFactory.createNewUser();
-    
+
         await supertest(app).post("/sign-up").send(user);
 
         const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
@@ -103,7 +105,7 @@ describe("Test POST /tests", () => {
 
     it("If categoryId is invalid, should return statusCode 404", async () => {
         const user = userFactory.createNewUser();
-    
+
         await supertest(app).post("/sign-up").send(user);
 
         const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
@@ -116,11 +118,11 @@ describe("Test POST /tests", () => {
 
         const result = await supertest(app).post("/tests").set({ Authorization: `Bearer ${token}` }).send(newTest);
         expect(result.status).toEqual(404);
-    });   
+    });
 
     it("If teacherId is invalid, should return statusCode 404", async () => {
         const user = userFactory.createNewUser();
-    
+
         await supertest(app).post("/sign-up").send(user);
 
         const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
@@ -137,7 +139,7 @@ describe("Test POST /tests", () => {
 
     it("If disciplineId is invalid, should return statusCode 404", async () => {
         const user = userFactory.createNewUser();
-    
+
         await supertest(app).post("/sign-up").send(user);
 
         const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
@@ -154,7 +156,7 @@ describe("Test POST /tests", () => {
 
     it("If teacherDiscipline relation is invalid, should return statusCode 404", async () => {
         const user = userFactory.createNewUser();
-    
+
         await supertest(app).post("/sign-up").send(user);
 
         const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
@@ -167,6 +169,58 @@ describe("Test POST /tests", () => {
 
         const result = await supertest(app).post("/tests").set({ Authorization: `Bearer ${token}` }).send(newTest);
         expect(result.status).toEqual(404);
+    });
+});
+
+describe("Test GET /tests/terms ", () => {
+    it("Should return array with all tests grouped by terms and statusCode 200", async () => {
+        const user = userFactory.createNewUser();
+
+        await supertest(app).post("/sign-up").send(user);
+
+        const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
+        const token = loggedUser.body.token;
+
+        expect(loggedUser.status).toEqual(200);
+        expect(token).not.toBeNull();
+
+        const result = await supertest(app).get("/tests/terms").set({ Authorization: `Bearer ${token}` });
+
+        expect(result.status).toEqual(200);
+        expect(result.body).toBeInstanceOf(Array);
+    });
+
+    it("If token is invalid, should return statusCode 401", async () => {
+        const token = "invalid_token";
+
+        const result = await supertest(app).get("/tests/terms").set({ Authorization: `Bearer ${token}` });
+        expect(result.status).toEqual(401);
+    });
+});
+
+describe("Test GET /tests/teachers ", () => {
+    it("Should return array with all tests grouped by teachers and statusCode 200", async () => {
+        const user = userFactory.createNewUser();
+
+        await supertest(app).post("/sign-up").send(user);
+
+        const loggedUser = await supertest(app).post("/sign-in").send({ email: user.email, password: user.password });
+        const token = loggedUser.body.token;
+
+        expect(loggedUser.status).toEqual(200);
+        expect(token).not.toBeNull();
+
+        const result = await supertest(app).get("/tests/teachers").set({ Authorization: `Bearer ${token}` });
+
+        expect(result.status).toEqual(200);
+        expect(result.body).toBeInstanceOf(Array);
+    });
+
+    it("If token is invalid, should return statusCode 401", async () => {
+        const token = "invalid_token";
+
+        const result = await supertest(app).get("/tests/teachers").set({ Authorization: `Bearer ${token}` });
+        expect(result.status).toEqual(401);
     });
 });
 

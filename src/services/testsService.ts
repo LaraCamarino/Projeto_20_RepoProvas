@@ -1,5 +1,5 @@
 import * as testsRepository from "../repositories/testsRepository.js";
-import { TypeNewTest } from "../types/testsTypes.js";
+import { TypeNewTest, TypeTestNoID } from "../types/testsTypes.js";
 
 export async function insertNewTest(newTest: TypeNewTest) {
     const { name, pdfUrl, categoryId, teacherId, disciplineId } = newTest;
@@ -29,7 +29,7 @@ export async function insertNewTest(newTest: TypeNewTest) {
     }
 
     const teacherDiscipline = await testsRepository.findTeacherDiscipline(teacherId, disciplineId);
-    if(!teacherDiscipline) {
+    if (!teacherDiscipline) {
         throw {
             type: "not_found",
             message: "This teacher does not teach this discipline."
@@ -42,4 +42,14 @@ export async function insertNewTest(newTest: TypeNewTest) {
         categoryId,
         teacherDisciplineId: teacherDiscipline.id
     })
+}
+
+export async function getTestsGroupedByTerms() {
+    const tests = await testsRepository.getTestsGroupedByTerms();
+    return tests;
+}
+
+export async function getTestsGroupedByTeacher() {
+    const tests = await testsRepository.getTestsGroupedByTeacher();
+    return tests;
 }
