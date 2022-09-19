@@ -1,13 +1,9 @@
 import supertest from "supertest";
-import dotenv from "dotenv";
 
 import app from "../src/app";
 import prisma from "../src/dbStrategy/database";
 import * as userFactory from "./factories/userFactory";
 import * as testFactory from "./factories/testFactory";
-
-dotenv.config();
-console.log("Database = " + process.env.DATABASE_URL);
 
 beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE "users";`;
